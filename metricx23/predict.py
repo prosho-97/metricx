@@ -122,7 +122,7 @@ def get_dataset(
   )
 
   # Add data collator for batching mode
-  data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding=True)
+  data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer, padding=True)
 
   return ds, data_collator
 
@@ -160,7 +160,7 @@ def main() -> None:
   trainer = transformers.Trainer(
       model=model,
       args=training_args,
-      datacollator=datacollator,
+      data_collator=datacollator,
   )
   predictions, _, _ = trainer.predict(test_dataset=ds["test"])
 
