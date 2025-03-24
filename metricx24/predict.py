@@ -64,7 +64,7 @@ class Arguments:
 def get_dataset(
     input_file: str, tokenizer, max_input_length: int, device, is_qe: bool
 ):
-  """Gets the test dataset for prediction.
+  """Gets the test dataset and the HF DataCollator object for prediction.
 
   If `is_qe` is true, the input data must have "hypothesis" and "source" fields.
   If it is false, there must be "hypothesis" and "reference" fields.
@@ -77,7 +77,7 @@ def get_dataset(
     is_qe: Indicates whether the metric is a QE metric or not.
 
   Returns:
-    The dataset.
+    The dataset and the HF DataCollator object.
   """
 
   def _make_input(example):
@@ -122,7 +122,11 @@ def get_dataset(
       device=device,
       output_all_columns=True,
   )
-  return ds
+
+  # Add data collator for batching mode
+  data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer, padding=True)
+
+  return ds, data_collator
 
 
 def main() -> None:
@@ -145,7 +149,7 @@ def main() -> None:
   model.to(device)
   model.eval()
 
-  ds = get_dataset(
+  ds, datacollator = get_dataset(
       args.input_file,
       tokenizer,
       args.max_input_length,
@@ -161,6 +165,7 @@ def main() -> None:
   trainer = transformers.Trainer(
       model=model,
       args=training_args,
+      data_collator=datacollator,
   )
   predictions, _, _ = trainer.predict(test_dataset=ds["test"])
 

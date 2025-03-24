@@ -64,7 +64,7 @@ class Arguments:
 def get_dataset(
     input_file: str, tokenizer, max_input_length: int, device, is_qe: bool
 ):
-  """Gets the test dataset for prediction.
+  """Gets the test dataset and the HF DataCollator object for prediction.
 
   If `is_qe` is true, the input data must have "hypothesis" and "source" fields.
   If it is false, there must be "hypothesis" and "reference" fields.
